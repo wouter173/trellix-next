@@ -11,6 +11,8 @@ export async function GET(request: Request): Promise<Response> {
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')
   const storedState = cookies().get('github_oauth_state')?.value ?? null
+  cookies().set('github_oauth_state', '', { maxAge: 0 })
+
   if (!code || !state || !storedState || state !== storedState) {
     return new Response(null, {
       status: 400,
@@ -32,12 +34,11 @@ export async function GET(request: Request): Promise<Response> {
       })
       .parse(await githubUserResponse.json())
 
-    const existingUser = await prisma.user.findFirst({ where: { github_id: githubUser.id } })
+    const existingUser = await prisma.user.findFirst({ where: { githubId: githubUser.id } })
 
     if (existingUser) {
       const session = await lucia.createSession(existingUser.id, {})
       const sessionCookie = lucia.createSessionCookie(session.id)
-      cookies().set('github_oauth_state', '', { maxAge: 0 })
       cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
       return new Response(null, { status: 302, headers: { Location: '/' } })
@@ -48,14 +49,13 @@ export async function GET(request: Request): Promise<Response> {
     await prisma.user.create({
       data: {
         id: userId,
-        github_id: githubUser.id,
+        githubId: githubUser.id,
         username: githubUser.login,
       },
     })
 
     const session = await lucia.createSession(userId, {})
     const sessionCookie = lucia.createSessionCookie(session.id)
-    cookies().set('github_oauth_state', '', { maxAge: 0 })
     cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
     return new Response(null, { status: 302, headers: { Location: '/' } })
