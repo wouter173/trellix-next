@@ -13,6 +13,7 @@ model User {
   github_id Int       @unique
   username  String
   sessions  Session[]
+  Board     Board[]
 
   @@map("user")
 }
@@ -24,4 +25,34 @@ model Session {
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 
   @@map("session")
+}
+
+model Board {
+  id      String   @id
+  userId  String
+  name    String
+  columns Column[]
+  user    User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@map("board")
+}
+
+model Column {
+  id      String @id
+  boardId String
+  name    String
+  tasks   Task[]
+  board   Board  @relation(references: [id], fields: [boardId], onDelete: Cascade)
+
+  @@map("column")
+}
+
+model Task {
+  id       String @id
+  columnId String
+  name     String
+  boardId  String
+  column   Column @relation(references: [id], fields: [columnId], onDelete: Cascade)
+
+  @@map("task")
 }
