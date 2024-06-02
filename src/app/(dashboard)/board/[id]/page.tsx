@@ -1,4 +1,4 @@
-import { getBoardTasks } from '@/data/get-board-tasks'
+import { getBoardCards } from '@/data/get-board-cards'
 import { validateRequest } from '@/lib/auth/api'
 import { notFound, redirect } from 'next/navigation'
 import { Board } from './board'
@@ -7,7 +7,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   const { user } = await validateRequest()
   if (!user) redirect('/signin')
 
-  const result = await getBoardTasks(params.id)
+  const result = await getBoardCards(params.id)
   if (!result) return notFound()
 
   return (

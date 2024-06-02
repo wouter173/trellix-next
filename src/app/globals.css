@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.pressable {
+  @apply cursor-pointer transition-all duration-75 ease-in-out active:scale-95;
+}
+
+.focusable {
+  @apply focus-within:ring-2 focus-within:ring-slate-500 focus-within:ring-opacity-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50;
+}

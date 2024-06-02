@@ -2,7 +2,7 @@ import { validateRequest } from '@/lib/auth/api'
 import { prisma } from '@/lib/db/prisma'
 import { cache } from 'react'
 
-export const getBoardTasks = cache(async (boardId: string) => {
+export const getBoardCards = cache(async (boardId: string) => {
   const { user } = await validateRequest()
   if (!user) return null
 
@@ -13,7 +13,12 @@ export const getBoardTasks = cache(async (boardId: string) => {
 
   const columns = await prisma.column.findMany({
     where: { boardId },
-    include: { tasks: true },
+    include: {
+      cards: {
+        orderBy: { order: 'asc' },
+      },
+    },
+    orderBy: { order: 'asc' },
   })
 
   return { columns }

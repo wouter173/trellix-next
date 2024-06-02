@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
-      <body className={`${GeistSans.variable} ${GeistMono.variable} bg-gray-100 font-sans`}>
+      <body className={`${GeistSans.variable} ${GeistMono.variable} bg-[#cbd5e1] font-sans`}>
         <div className="py-20">{children}</div>
       </body>
     </html>

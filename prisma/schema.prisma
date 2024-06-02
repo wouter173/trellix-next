@@ -41,18 +41,19 @@ model Column {
   id      String @id
   boardId String
   name    String
-  tasks   Task[]
+  order   Int
+  cards   Card[]
   board   Board  @relation(references: [id], fields: [boardId], onDelete: Cascade)
 
   @@map("column")
 }
 
-model Task {
+model Card {
   id       String @id
   columnId String
   name     String
-  boardId  String
+  order    Float
   column   Column @relation(references: [id], fields: [columnId], onDelete: Cascade)
 
-  @@map("task")
+  @@map("card")
 }
