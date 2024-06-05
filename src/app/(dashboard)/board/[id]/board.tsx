@@ -4,6 +4,7 @@ import { addColumnAction, addCardAction, removeColumnAction, moveCardAction } fr
 import { nanoid } from 'nanoid'
 import { produce } from 'immer'
 import { cn } from '@/lib/utils'
+import { Trash2Icon } from 'lucide-react'
 
 export const Board = (props: {
   boardId: string
@@ -79,7 +80,7 @@ export const Board = (props: {
             </li>
           ))}
           <li>
-            <AddColumnButton addColumn={addColumn} />
+            <AddColumnForm addColumn={addColumn} />
           </li>
           <li className="h-1 w-20 flex-shrink-0" />
         </ul>
@@ -88,8 +89,68 @@ export const Board = (props: {
   )
 }
 
-const AddColumnButton = ({ addColumn }: { addColumn: (name: string) => void }) => {
-  return <button onClick={() => addColumn('New Column')}>+</button>
+const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => {
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  const stopEditing = () => {
+    setEditing(false)
+    setName('')
+  }
+
+  const handleSubmit = () => {
+    setName('')
+    addColumn(name)
+  }
+
+  if (!editing)
+    return (
+      <button
+        className="focusable pressable mt-1 w-max rounded-xl px-2.5 py-1.5 text-left font-medium shadow-slate-400 transition-all hover:bg-slate-100 hover:shadow-sm"
+        onClick={() => setEditing(true)}
+      >
+        + add column
+      </button>
+    )
+
+  return (
+    <form
+      className="mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 shadow-sm shadow-slate-400"
+      ref={formRef}
+      noValidate={false}
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleSubmit()
+      }}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) stopEditing()
+      }}
+    >
+      <input
+        required
+        autoFocus
+        className="w-full resize-none rounded-lg p-2 py-1"
+        onChange={(e) => setName(e.target.value)}
+        value={name}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') stopEditing()
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            formRef.current?.requestSubmit()
+          }
+        }}
+      />
+      <div className="flex gap-2">
+        <button type="submit" className="focusable pressable rounded-lg bg-slate-700 px-2 py-1.5 text-white hover:bg-slate-900">
+          Create
+        </button>
+        <button type="button" onMouseDown={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
+          Cancel
+        </button>
+      </div>
+    </form>
+  )
 }
 
 const Column = (props: {
@@ -156,10 +217,18 @@ const Column = (props: {
     setClosestIndicatorIndex(closestIndicator.beforeOrder)
   }
 
+  const removeColumn = () => {
+    if (props.cards.length > 0) {
+      if (!confirm(`Are you sure you want to delete this column? You'll delete ${props.cards.length} cards along with the column.`)) return
+    }
+
+    props.removeColumn(props.id)
+  }
+
   return (
     <div
       className={cn(
-        'mt-1 flex min-w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 shadow-sm shadow-slate-400',
+        'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 pt-3 shadow-sm shadow-slate-400',
         dragOver && props.cards.length === 0 && 'ring-2 ring-slate-500 ring-opacity-70',
       )}
       onDragOver={onDragOver}
@@ -167,7 +236,13 @@ const Column = (props: {
       onDrop={onDrop}
     >
       <div className="flex justify-between px-2">
-        <h2>{props.name}</h2> <button onClick={() => props.removeColumn(props.id)}>x</button>
+        <h2>{props.name}</h2>
+        <button
+          onClick={removeColumn}
+          className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500"
+        >
+          <Trash2Icon className="size-4" />
+        </button>
       </div>
 
       <div className="flex flex-col gap-0.5">
@@ -201,8 +276,11 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
 
   if (!editing)
     return (
-      <button className="pressable rounded-lg p-2 px-4 text-left font-medium hover:bg-slate-200" onClick={() => setEditing(true)}>
-        + add a card
+      <button
+        className="focusable pressable rounded-lg px-2.5 py-1.5 text-left font-medium hover:bg-slate-200"
+        onClick={() => setEditing(true)}
+      >
+        + add card
       </button>
     )
 
@@ -228,7 +306,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
         value={name}
         onKeyDown={(e) => {
           if (e.key === 'Escape') stopEditing()
-          if (e.key === 'Enter') {
+          if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
             formRef.current?.requestSubmit()
           }
@@ -254,7 +332,7 @@ const Card = (props: { name: string; id: string; order: number }) => {
           e.dataTransfer.setData('card-id', props.id)
         }}
         className={cn(
-          'border-t-px border-b-px cursor-grab rounded-lg border border-transparent bg-white px-2 py-1 shadow shadow-slate-300 active:cursor-grabbing',
+          'border-t-px border-b-px w-full cursor-grab hyphens-auto whitespace-pre-wrap break-all rounded-lg border border-transparent bg-white px-2 py-1 text-justify shadow shadow-slate-300 active:cursor-grabbing',
         )}
         draggable
       >
