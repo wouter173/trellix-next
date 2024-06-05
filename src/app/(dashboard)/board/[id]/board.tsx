@@ -30,7 +30,7 @@ export const Board = (props: {
 
   const addCard = ({ columnId, name }: { name: string; columnId: string }) => {
     startTransition(async () => {
-      const newCard = { id: nanoid(), name, columnId, order: columns.find((column) => column.id === columnId)?.cards.length ?? 0 }
+      const newCard = { id: nanoid(), name, columnId, order: (columns.find((column) => column.id === columnId)?.cards.length ?? 0) + 1 }
 
       const nextState = produce(columns, (draftColumns) => {
         const columnIndex = draftColumns.findIndex((column) => column.id === columnId)
@@ -48,7 +48,6 @@ export const Board = (props: {
   }
 
   const moveCard = ({ cardId, columnId, order }: { cardId: string; columnId: string; order: number }) => {
-    console.log('moving card', cardId, 'to column', columnId, 'at order', order)
     startTransition(async () => {
       const card = columns.flatMap((column) => column.cards).find((card) => card.id === cardId)
       if (!card) return
@@ -130,8 +129,6 @@ const Column = (props: {
     let newOrder = (aboveOrder + toOrder) / 2
     if (currentIndex === -1) newOrder = (props.cards.at(-1)?.order ?? 0) + 1
 
-    console.log(aboveOrder, toOrder, currentIndex)
-
     props.moveCard({ cardId, columnId, order: newOrder })
 
     setClosestIndicatorIndex(null)
@@ -204,7 +201,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
 
   if (!editing)
     return (
-      <button className="pressable rounded-lg p-2 font-medium hover:bg-slate-200" onClick={() => setEditing(true)}>
+      <button className="pressable rounded-lg p-2 px-4 text-left font-medium hover:bg-slate-200" onClick={() => setEditing(true)}>
         + add a card
       </button>
     )
