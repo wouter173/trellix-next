@@ -131,3 +131,36 @@ export const moveCardAction = async (actionData: { boardId: string; cardId: stri
 
   return { success: true }
 }
+
+export const updateColumnNameAction = async (data: { boardId: string; columnId: string; name: string }) => {
+  const { user } = await validateRequest()
+  if (!user) return null
+
+  const board = await prisma.board.findFirst({ where: { userId: user.id, id: data.boardId } })
+  if (!board) return null
+
+  await prisma.column.update({
+    where: { id: data.columnId },
+    data: { name: data.name },
+  })
+
+  revalidatePath(`/board/${data.boardId}`)
+
+  return { success: true }
+}
+
+export const deleteCardAction = async (data: { boardId: string; cardId: string }) => {
+  const { user } = await validateRequest()
+  if (!user) return null
+
+  const board = await prisma.board.findFirst({ where: { userId: user.id, id: data.boardId } })
+  if (!board) return null
+
+  await prisma.card.delete({
+    where: { id: data.cardId },
+  })
+
+  revalidatePath(`/board/${data.boardId}`)
+
+  return { success: true }
+}

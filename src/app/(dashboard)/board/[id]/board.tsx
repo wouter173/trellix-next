@@ -1,6 +1,6 @@
 'use client'
 import { DragEvent, Fragment, startTransition, useOptimistic, useRef, useState } from 'react'
-import { addColumnAction, addCardAction, removeColumnAction, moveCardAction } from './actions'
+import { addColumnAction, addCardAction, removeColumnAction, moveCardAction, updateColumnNameAction, deleteCardAction } from './actions'
 import { nanoid } from 'nanoid'
 import { produce } from 'immer'
 import { cn } from '@/lib/utils'
@@ -63,6 +63,33 @@ export const Board = (props: {
     })
   }
 
+  const updateColumnName = (name: string, columnId: string) => {
+    startTransition(async () => {
+      const columnIndex = columns.findIndex((column) => column.id === columnId)
+      const nextState = produce(columns, (draftColumns) => {
+        draftColumns[columnIndex].name = name
+      })
+
+      setColumns(nextState)
+
+      await updateColumnNameAction({ name, columnId, boardId: props.boardId })
+    })
+  }
+
+  const deleteCard = (cardId: string) => {
+    startTransition(async () => {
+      const nextState = produce(columns, (draftColumns) => {
+        const columnIndex = draftColumns.findIndex((column) => column.cards.some((card) => card.id === cardId))
+        const cardIndex = draftColumns[columnIndex].cards.findIndex((card) => card.id === cardId)
+        draftColumns[columnIndex].cards.splice(cardIndex, 1)
+      })
+
+      setColumns(nextState)
+
+      await deleteCardAction({ cardId, boardId: props.boardId })
+    })
+  }
+
   return (
     <div className="min-h-screen w-full overflow-x-scroll">
       <div className="px-20 pb-20">
@@ -73,8 +100,10 @@ export const Board = (props: {
                 id={column.id}
                 name={column.name}
                 cards={column.cards}
-                removeColumn={(columnId: string) => removeColumn({ boardId: props.boardId, columnId })}
-                addCard={(name: string) => addCard({ name, columnId: column.id })}
+                updateName={(name) => updateColumnName(name, column.id)}
+                removeColumn={(columnId) => removeColumn({ boardId: props.boardId, columnId })}
+                addCard={(name) => addCard({ name, columnId: column.id })}
+                deleteCard={deleteCard}
                 moveCard={moveCard}
               />
             </li>
@@ -145,7 +174,7 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
         <button type="submit" className="focusable pressable rounded-lg bg-slate-700 px-2 py-1.5 text-white hover:bg-slate-900">
           Create
         </button>
-        <button type="button" onMouseDown={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
+        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
           Cancel
         </button>
       </div>
@@ -157,8 +186,10 @@ const Column = (props: {
   name: string
   id: string
   cards: { name: string; id: string; order: number }[]
+  updateName: (name: string) => void
   removeColumn: (id: string) => void
   addCard: (name: string) => void
+  deleteCard: (cardId: string) => void
   moveCard: (args: { cardId: string; columnId: string; order: number }) => void
 }) => {
   const [dragOver, setDragOver] = useState(false)
@@ -229,14 +260,14 @@ const Column = (props: {
     <div
       className={cn(
         'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 pt-3 shadow-sm shadow-slate-400',
-        dragOver && props.cards.length === 0 && 'ring-2 ring-slate-500 ring-opacity-70',
+        dragOver && props.cards.length === 0 && 'opacity-100 ring-[3px] ring-red-500',
       )}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
-      <div className="flex justify-between px-2">
-        <h2>{props.name}</h2>
+      <div className="flex w-full justify-between px-2">
+        <ColumnName name={props.name} updateName={props.updateName} />
         <button
           onClick={removeColumn}
           className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500"
@@ -245,17 +276,51 @@ const Column = (props: {
         </button>
       </div>
 
-      <div className="flex flex-col gap-0.5">
-        {props.cards.map((card) => (
-          <Fragment key={card.id}>
-            <DropIndicator showing={card.order === closestIndicatorIndex} columnId={props.id} beforeOrder={card.order} />
-            <Card name={card.name} id={card.id} order={card.order} />
-          </Fragment>
-        ))}
-        <DropIndicator showing={closestIndicatorIndex === -1} columnId={props.id} beforeOrder={-1} />
-      </div>
+      {props.cards.length > 0 && (
+        <div className="flex flex-col gap-0.5">
+          {props.cards.map((card) => (
+            <Fragment key={card.id}>
+              <DropIndicator showing={card.order === closestIndicatorIndex} columnId={props.id} beforeOrder={card.order} />
+              <Card name={card.name} id={card.id} order={card.order} deleteCard={() => props.deleteCard(card.id)} />
+            </Fragment>
+          ))}
+          <DropIndicator showing={closestIndicatorIndex === -1} columnId={props.id} beforeOrder={-1} />
+        </div>
+      )}
       <AddCardForm addCard={props.addCard} />
     </div>
+  )
+}
+
+const ColumnName = (props: { name: string; updateName: (name: string) => void }) => {
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [name, setName] = useState(props.name)
+
+  if (!isEditingName)
+    return (
+      <button onClick={() => setIsEditingName(true)} className="w-11/12 shrink text-left">
+        <h2 className="truncate">{name}</h2>
+      </button>
+    )
+
+  return (
+    <input
+      autoFocus
+      className="focusable -ml-2 w-11/12 rounded-lg px-2"
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          setIsEditingName(false)
+          props.updateName(name)
+        }
+      }}
+      onBlur={() => {
+        setIsEditingName(false)
+        props.updateName(name)
+      }}
+    />
   )
 }
 
@@ -316,7 +381,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
         <button type="submit" className="focusable pressable rounded-lg bg-slate-700 px-2 py-1.5 text-white hover:bg-slate-900">
           Save Card
         </button>
-        <button type="button" onMouseDown={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
+        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
           Cancel
         </button>
       </div>
@@ -324,7 +389,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
   )
 }
 
-const Card = (props: { name: string; id: string; order: number }) => {
+const Card = (props: { name: string; id: string; order: number; deleteCard: () => void }) => {
   return (
     <>
       <div
@@ -332,11 +397,14 @@ const Card = (props: { name: string; id: string; order: number }) => {
           e.dataTransfer.setData('card-id', props.id)
         }}
         className={cn(
-          'border-t-px border-b-px w-full cursor-grab hyphens-auto whitespace-pre-wrap break-all rounded-lg border border-transparent bg-white px-2 py-1 text-justify shadow shadow-slate-300 active:cursor-grabbing',
+          'border-t-px border-b-px flex w-full cursor-grab justify-between hyphens-auto whitespace-pre-wrap break-all rounded-lg border border-transparent bg-white px-2 py-1 text-justify shadow shadow-slate-300 active:cursor-grabbing',
         )}
         draggable
       >
         {props.name}
+        <button className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500">
+          <Trash2Icon className="size-4" onClick={props.deleteCard} />
+        </button>
       </div>
     </>
   )
