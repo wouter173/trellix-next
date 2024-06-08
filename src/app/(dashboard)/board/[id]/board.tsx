@@ -1,16 +1,18 @@
 'use client'
-import { DragEvent, Fragment, startTransition, useOptimistic, useRef, useState } from 'react'
+import { ComponentProps, DragEvent, Fragment, RefObject, startTransition, useOptimistic, useRef, useState } from 'react'
 import { addColumnAction, addCardAction, removeColumnAction, moveCardAction, updateColumnNameAction, deleteCardAction } from './actions'
 import { nanoid } from 'nanoid'
 import { produce } from 'immer'
 import { cn } from '@/lib/utils'
 import { Trash2Icon } from 'lucide-react'
+import { AnimatePresence, motion, useMotionTemplate, useMotionValueEvent, useScroll, useTransform } from 'framer-motion'
 
 export const Board = (props: {
   boardId: string
   columns: { order: number; name: string; id: string; cards: { id: string; columnId: string; name: string; order: number }[] }[]
 }) => {
   const [columns, setColumns] = useOptimistic(props.columns)
+  const scrollContainerRef = useRef<HTMLUListElement>(null)
 
   const addColumn = (name: string) => {
     startTransition(async () => {
@@ -91,30 +93,29 @@ export const Board = (props: {
   }
 
   return (
-    <div className="min-h-screen w-full overflow-x-scroll">
-      <div className="px-20 pb-20">
-        <ul className="flex w-full gap-2">
-          {columns.map((column) => (
-            <li key={column.id}>
-              <Column
-                id={column.id}
-                name={column.name}
-                cards={column.cards}
-                updateName={(name) => updateColumnName(name, column.id)}
-                removeColumn={(columnId) => removeColumn({ boardId: props.boardId, columnId })}
-                addCard={(name) => addCard({ name, columnId: column.id })}
-                deleteCard={deleteCard}
-                moveCard={moveCard}
-              />
-            </li>
-          ))}
-          <li>
-            <AddColumnForm addColumn={addColumn} />
+    <AnimatePresence initial={false}>
+      <ul ref={scrollContainerRef} className="flex h-full w-full snap-x snap-mandatory scroll-pl-20 gap-2 overflow-x-scroll px-20">
+        {columns.map((column) => (
+          <li key={column.id} className="snap-start">
+            <Column
+              id={column.id}
+              name={column.name}
+              cards={column.cards}
+              scrollContainerRef={scrollContainerRef as RefObject<HTMLUListElement>}
+              updateName={(name) => updateColumnName(name, column.id)}
+              removeColumn={(columnId) => removeColumn({ boardId: props.boardId, columnId })}
+              addCard={(name) => addCard({ name, columnId: column.id })}
+              deleteCard={deleteCard}
+              moveCard={moveCard}
+            />
           </li>
-          <li className="h-1 w-20 flex-shrink-0" />
-        </ul>
-      </div>
-    </div>
+        ))}
+        <li>
+          <AddColumnForm addColumn={addColumn} />
+        </li>
+        <li className="h-1 w-20 flex-shrink-0" />
+      </ul>
+    </AnimatePresence>
   )
 }
 
@@ -186,6 +187,7 @@ const Column = (props: {
   name: string
   id: string
   cards: { name: string; id: string; order: number }[]
+  scrollContainerRef: RefObject<HTMLUListElement>
   updateName: (name: string) => void
   removeColumn: (id: string) => void
   addCard: (name: string) => void
@@ -257,38 +259,64 @@ const Column = (props: {
   }
 
   return (
-    <div
-      className={cn(
-        'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 pt-3 shadow-sm shadow-slate-400',
-        dragOver && props.cards.length === 0 && 'opacity-100 ring-[3px] ring-red-500',
-      )}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-    >
-      <div className="flex w-full justify-between px-2">
-        <ColumnName name={props.name} updateName={props.updateName} />
-        <button
-          onClick={removeColumn}
-          className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500"
-        >
-          <Trash2Icon className="size-4" />
-        </button>
-      </div>
-
-      {props.cards.length > 0 && (
-        <div className="flex flex-col gap-0.5">
-          {props.cards.map((card) => (
-            <Fragment key={card.id}>
-              <DropIndicator showing={card.order === closestIndicatorIndex} columnId={props.id} beforeOrder={card.order} />
-              <Card name={card.name} id={card.id} order={card.order} deleteCard={() => props.deleteCard(card.id)} />
-            </Fragment>
-          ))}
-          <DropIndicator showing={closestIndicatorIndex === -1} columnId={props.id} beforeOrder={-1} />
+    <ColumnPresence scrollContainerRef={props.scrollContainerRef}>
+      <div
+        className={cn(
+          'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 pt-3 shadow-sm shadow-slate-400',
+          dragOver && props.cards.length === 0 && 'opacity-100 ring-[3px] ring-red-500',
+        )}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+      >
+        <div className="flex w-full justify-between px-2">
+          <ColumnName name={props.name} updateName={props.updateName} />
+          <button
+            onClick={removeColumn}
+            className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500"
+          >
+            <Trash2Icon className="size-4" />
+          </button>
         </div>
-      )}
-      <AddCardForm addCard={props.addCard} />
-    </div>
+
+        {props.cards.length > 0 && (
+          <div className="flex flex-col gap-0.5">
+            {props.cards.map((card) => (
+              <Fragment key={card.id}>
+                <DropIndicator showing={card.order === closestIndicatorIndex} columnId={props.id} beforeOrder={card.order} />
+                <Card name={card.name} id={card.id} order={card.order} deleteCard={() => props.deleteCard(card.id)} />
+              </Fragment>
+            ))}
+            <DropIndicator showing={closestIndicatorIndex === -1} columnId={props.id} beforeOrder={-1} />
+          </div>
+        )}
+        <AddCardForm addCard={props.addCard} />
+      </div>
+    </ColumnPresence>
+  )
+}
+
+const ColumnPresence = ({
+  scrollContainerRef,
+  ...props
+}: ComponentProps<typeof motion.div> & { scrollContainerRef: RefObject<HTMLUListElement> }) => {
+  const columnRef = useRef<HTMLDivElement>(null)
+
+  const { scrollX } = useScroll({ container: scrollContainerRef, axis: 'x' })
+  const relativeX = useTransform(scrollX, (value) => {
+    const leftOffset = value - (columnRef.current?.offsetLeft ?? 0)
+    const rightOffset =
+      scrollContainerRef.current?.clientWidth - (columnRef.current?.offsetLeft ?? 0) - (columnRef.current?.clientWidth ?? 0) + value - 200
+
+    return Math.max(leftOffset, -1 * rightOffset)
+  })
+
+  const opacity = useTransform(relativeX, [80, 200], [1, 0.6])
+
+  return (
+    <>
+      <motion.div ref={columnRef} style={{ opacity }} {...props} />
+    </>
   )
 }
 
