@@ -1,96 +1,19 @@
 'use client'
-import { ComponentProps, DragEvent, Fragment, RefObject, startTransition, useOptimistic, useRef, useState } from 'react'
-import { addColumnAction, addCardAction, removeColumnAction, moveCardAction, updateColumnNameAction, deleteCardAction } from './actions'
-import { nanoid } from 'nanoid'
-import { produce } from 'immer'
 import { cn } from '@/lib/utils'
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 import { Trash2Icon } from 'lucide-react'
-import { AnimatePresence, motion, useMotionTemplate, useMotionValueEvent, useScroll, useTransform } from 'framer-motion'
+import { ComponentProps, DragEvent, Fragment, RefObject, useRef, useState } from 'react'
+import { useOptimisticColumns } from './use-optimistic-columns'
 
 export const Board = (props: {
   boardId: string
   columns: { order: number; name: string; id: string; cards: { id: string; columnId: string; name: string; order: number }[] }[]
 }) => {
-  const [columns, setColumns] = useOptimistic(props.columns)
+  const { columns, addCard, addColumn, moveCard, removeCard, removeColumn, updateColumnName } = useOptimisticColumns(
+    props.boardId,
+    props.columns,
+  )
   const scrollContainerRef = useRef<HTMLUListElement>(null)
-
-  const addColumn = (name: string) => {
-    startTransition(async () => {
-      const id = nanoid()
-      const newCol = { name, id, order: columns.length, cards: [] }
-
-      setColumns([...columns, newCol])
-      await addColumnAction({ ...newCol, boardId: props.boardId })
-    })
-  }
-
-  const removeColumn = ({ columnId, boardId }: { columnId: string; boardId: string }) => {
-    startTransition(async () => {
-      setColumns(columns.filter((column) => column.id !== columnId))
-      await removeColumnAction({ columnId, boardId })
-    })
-  }
-
-  const addCard = ({ columnId, name }: { name: string; columnId: string }) => {
-    startTransition(async () => {
-      const newCard = { id: nanoid(), name, columnId, order: (columns.find((column) => column.id === columnId)?.cards.length ?? 0) + 1 }
-
-      const nextState = produce(columns, (draftColumns) => {
-        const columnIndex = draftColumns.findIndex((column) => column.id === columnId)
-        draftColumns[columnIndex].cards.push(newCard)
-      })
-
-      setColumns(nextState)
-
-      await addCardAction({
-        ...newCard,
-        boardId: props.boardId,
-        order: newCard.order,
-      })
-    })
-  }
-
-  const moveCard = ({ cardId, columnId, order }: { cardId: string; columnId: string; order: number }) => {
-    startTransition(async () => {
-      const card = columns.flatMap((column) => column.cards).find((card) => card.id === cardId)
-      if (!card) return
-
-      await moveCardAction({
-        toColumnId: columnId,
-        order,
-        cardId,
-
-        boardId: props.boardId,
-      })
-    })
-  }
-
-  const updateColumnName = (name: string, columnId: string) => {
-    startTransition(async () => {
-      const columnIndex = columns.findIndex((column) => column.id === columnId)
-      const nextState = produce(columns, (draftColumns) => {
-        draftColumns[columnIndex].name = name
-      })
-
-      setColumns(nextState)
-
-      await updateColumnNameAction({ name, columnId, boardId: props.boardId })
-    })
-  }
-
-  const deleteCard = (cardId: string) => {
-    startTransition(async () => {
-      const nextState = produce(columns, (draftColumns) => {
-        const columnIndex = draftColumns.findIndex((column) => column.cards.some((card) => card.id === cardId))
-        const cardIndex = draftColumns[columnIndex].cards.findIndex((card) => card.id === cardId)
-        draftColumns[columnIndex].cards.splice(cardIndex, 1)
-      })
-
-      setColumns(nextState)
-
-      await deleteCardAction({ cardId, boardId: props.boardId })
-    })
-  }
 
   return (
     <AnimatePresence initial={false}>
@@ -105,7 +28,7 @@ export const Board = (props: {
               updateName={(name) => updateColumnName(name, column.id)}
               removeColumn={(columnId) => removeColumn({ boardId: props.boardId, columnId })}
               addCard={(name) => addCard({ name, columnId: column.id })}
-              deleteCard={deleteCard}
+              removeCard={removeCard}
               moveCard={moveCard}
             />
           </li>
@@ -191,7 +114,7 @@ const Column = (props: {
   updateName: (name: string) => void
   removeColumn: (id: string) => void
   addCard: (name: string) => void
-  deleteCard: (cardId: string) => void
+  removeCard: (cardId: string) => void
   moveCard: (args: { cardId: string; columnId: string; order: number }) => void
 }) => {
   const [dragOver, setDragOver] = useState(false)
@@ -284,7 +207,7 @@ const Column = (props: {
             {props.cards.map((card) => (
               <Fragment key={card.id}>
                 <DropIndicator showing={card.order === closestIndicatorIndex} columnId={props.id} beforeOrder={card.order} />
-                <Card name={card.name} id={card.id} order={card.order} deleteCard={() => props.deleteCard(card.id)} />
+                <Card name={card.name} id={card.id} order={card.order} removeCard={() => props.removeCard(card.id)} />
               </Fragment>
             ))}
             <DropIndicator showing={closestIndicatorIndex === -1} columnId={props.id} beforeOrder={-1} />
@@ -306,18 +229,15 @@ const ColumnPresence = ({
   const relativeX = useTransform(scrollX, (value) => {
     const leftOffset = value - (columnRef.current?.offsetLeft ?? 0)
     const rightOffset =
-      scrollContainerRef.current?.clientWidth - (columnRef.current?.offsetLeft ?? 0) - (columnRef.current?.clientWidth ?? 0) + value - 200
+      scrollContainerRef.current?.clientWidth! - (columnRef.current?.offsetLeft ?? 0) - (columnRef.current?.clientWidth ?? 0) + value - 200
 
     return Math.max(leftOffset, -1 * rightOffset)
   })
 
   const opacity = useTransform(relativeX, [80, 200], [1, 0.6])
+  const safeToUseOpacity = useTransform(opacity, (value) => (isNaN(value) ? 1 : value))
 
-  return (
-    <>
-      <motion.div ref={columnRef} style={{ opacity }} {...props} />
-    </>
-  )
+  return <motion.div ref={columnRef} style={{ opacity: safeToUseOpacity }} {...props} />
 }
 
 const ColumnName = (props: { name: string; updateName: (name: string) => void }) => {
@@ -417,7 +337,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
   )
 }
 
-const Card = (props: { name: string; id: string; order: number; deleteCard: () => void }) => {
+const Card = (props: { name: string; id: string; order: number; removeCard: () => void }) => {
   return (
     <>
       <div
@@ -431,7 +351,7 @@ const Card = (props: { name: string; id: string; order: number; deleteCard: () =
       >
         {props.name}
         <button className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500">
-          <Trash2Icon className="size-4" onClick={props.deleteCard} />
+          <Trash2Icon className="size-4" onClick={props.removeCard} />
         </button>
       </div>
     </>
