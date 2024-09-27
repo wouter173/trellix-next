@@ -17,7 +17,7 @@ export const Board = (props: {
 
   return (
     <AnimatePresence initial={false}>
-      <ul ref={scrollContainerRef} className="flex h-full w-full snap-x snap-mandatory scroll-pl-20 gap-2 overflow-x-scroll px-20">
+      <ul ref={scrollContainerRef} className="flex h-full w-full snap-x snap-mandatory scroll-pl-20 gap-2 px-20">
         {columns.map((column) => (
           <li key={column.id} className="snap-start">
             <Column
@@ -60,7 +60,7 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
   if (!editing)
     return (
       <button
-        className="focusable pressable mt-1 w-max rounded-xl px-2.5 py-1.5 text-left font-medium shadow-slate-400 transition-all hover:bg-slate-100 hover:shadow-sm"
+        className="focusable pressable mt-1 w-max rounded-xl px-2.5 py-1.5 text-left font-medium transition-all hover:bg-gray-100 hover:shadow-sm"
         onClick={() => setEditing(true)}
       >
         + add column
@@ -69,7 +69,7 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
 
   return (
     <form
-      className="mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 shadow-sm shadow-slate-400"
+      className="mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 shadow-sm"
       ref={formRef}
       noValidate={false}
       onSubmit={(e) => {
@@ -95,10 +95,10 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
         }}
       />
       <div className="flex gap-2">
-        <button type="submit" className="focusable pressable rounded-lg bg-slate-700 px-2 py-1.5 text-white hover:bg-slate-900">
+        <button type="submit" className="focusable pressable rounded-lg bg-gray-700 px-2 py-1.5 text-white hover:bg-gray-900">
           Create
         </button>
-        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
+        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-gray-200">
           Cancel
         </button>
       </div>
@@ -185,7 +185,7 @@ const Column = (props: {
     <ColumnPresence scrollContainerRef={props.scrollContainerRef}>
       <div
         className={cn(
-          'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-slate-100 p-2 pt-3 shadow-sm shadow-slate-400',
+          'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 pt-3 shadow-sm',
           dragOver && props.cards.length === 0 && 'opacity-100 ring-[3px] ring-red-500',
         )}
         onDragOver={onDragOver}
@@ -196,7 +196,7 @@ const Column = (props: {
           <ColumnName name={props.name} updateName={props.updateName} />
           <button
             onClick={removeColumn}
-            className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500"
+            className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-gray-400 ring-red-500 transition-all hover:text-red-500"
           >
             <Trash2Icon className="size-4" />
           </button>
@@ -290,7 +290,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
   if (!editing)
     return (
       <button
-        className="focusable pressable rounded-lg px-2.5 py-1.5 text-left font-medium hover:bg-slate-200"
+        className="focusable pressable rounded-lg px-2.5 py-1.5 text-left font-medium hover:bg-gray-200"
         onClick={() => setEditing(true)}
       >
         + add card
@@ -326,10 +326,10 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
         }}
       />
       <div className="flex gap-2">
-        <button type="submit" className="focusable pressable rounded-lg bg-slate-700 px-2 py-1.5 text-white hover:bg-slate-900">
+        <button type="submit" className="focusable pressable rounded-lg bg-gray-700 px-2 py-1.5 text-white hover:bg-gray-900">
           Save Card
         </button>
-        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-slate-200">
+        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-gray-200">
           Cancel
         </button>
       </div>
@@ -345,12 +345,12 @@ const Card = (props: { name: string; id: string; order: number; removeCard: () =
           e.dataTransfer.setData('card-id', props.id)
         }}
         className={cn(
-          'border-t-px border-b-px flex w-full cursor-grab justify-between hyphens-auto whitespace-pre-wrap break-all rounded-lg border border-transparent bg-white px-2 py-1 text-justify shadow shadow-slate-300 active:cursor-grabbing',
+          'border-t-px border-b-px flex w-full cursor-grab justify-between hyphens-auto whitespace-pre-wrap break-all rounded-lg border border-transparent bg-white px-2 py-1 text-justify shadow-sm active:cursor-grabbing',
         )}
         draggable
       >
         {props.name}
-        <button className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-slate-400 ring-red-500 transition-all hover:text-red-500">
+        <button className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-gray-400 ring-red-500 transition-all hover:text-red-500">
           <Trash2Icon className="size-4" onClick={props.removeCard} />
         </button>
       </div>
