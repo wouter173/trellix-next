@@ -1,9 +1,9 @@
 'use server'
 
-import { generateState } from 'arctic'
-import { github } from '@/lib/auth/providers/github'
-import { cookies } from 'next/headers'
 import { env } from '@/env'
+import { github } from '@/lib/auth/providers/github'
+import { generateState } from 'arctic'
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export async function githubLoginAction() {
@@ -17,6 +17,5 @@ export async function githubLoginAction() {
     maxAge: 60 * 10,
     sameSite: 'lax',
   })
-
   redirect(url.toString())
 }

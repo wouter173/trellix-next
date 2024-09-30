@@ -4,6 +4,7 @@ import './globals.css'
 
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   title: 'Trellix Next 15',
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en">
       <body className={`${GeistSans.variable} ${GeistMono.variable} relative min-h-screen bg-[#ececed] font-sans`}>
         <div className="absolute inset-0 -z-10 bg-[url(/dot.svg)] bg-repeat opacity-50"></div>
+        <Toaster />
         {children}
       </body>
     </html>

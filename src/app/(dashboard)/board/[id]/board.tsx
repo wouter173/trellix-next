@@ -17,7 +17,10 @@ export const Board = (props: {
 
   return (
     <AnimatePresence initial={false}>
-      <ul ref={scrollContainerRef} className="flex h-full w-full snap-x snap-mandatory scroll-pl-20 gap-2 px-20">
+      <ul
+        ref={scrollContainerRef}
+        className="flex h-full min-h-[calc(100dvh-152px)] w-full snap-x snap-mandatory scroll-pl-20 gap-2 overflow-x-scroll px-20 pb-20"
+      >
         {columns.map((column) => (
           <li key={column.id} className="snap-start">
             <Column
@@ -192,11 +195,11 @@ const Column = (props: {
         onDragLeave={onDragLeave}
         onDrop={onDrop}
       >
-        <div className="flex w-full justify-between px-2">
+        <div className="group flex w-full justify-between px-2">
           <ColumnName name={props.name} updateName={props.updateName} />
           <button
             onClick={removeColumn}
-            className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-gray-400 ring-red-500 transition-all hover:text-red-500"
+            className="pressable focusable -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-gray-400 opacity-0 ring-red-500 transition-all hover:text-red-500 group-hover:opacity-100"
           >
             <Trash2Icon className="size-4" />
           </button>
@@ -345,12 +348,12 @@ const Card = (props: { name: string; id: string; order: number; removeCard: () =
           e.dataTransfer.setData('card-id', props.id)
         }}
         className={cn(
-          'border-t-px border-b-px flex w-full cursor-grab justify-between hyphens-auto whitespace-pre-wrap break-all rounded-lg border border-transparent bg-white px-2 py-1 text-justify shadow-sm active:cursor-grabbing',
+          'border-t-px border-b-px py-1shadow-sm group flex w-full cursor-grab justify-between rounded-lg border border-transparent bg-white px-2 py-1 active:cursor-grabbing',
         )}
         draggable
       >
-        {props.name}
-        <button className="pressable focusable -mr-1 flex size-6 items-center justify-center rounded-md text-gray-400 ring-red-500 transition-all hover:text-red-500">
+        <p className="hyphens-auto whitespace-pre-wrap break-words">{props.name}</p>
+        <button className="pressable focusable -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-gray-400 opacity-0 ring-red-500 transition-all hover:text-red-500 group-hover:opacity-100">
           <Trash2Icon className="size-4" onClick={props.removeCard} />
         </button>
       </div>

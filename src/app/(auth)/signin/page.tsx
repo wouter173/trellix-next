@@ -2,6 +2,7 @@ import { Card } from '@/app/card'
 import { validateRequest } from '@/lib/auth/api'
 import { redirect } from 'next/navigation'
 import { githubLoginAction } from './actions'
+import { GithubSigninButton } from './github-signin-button'
 
 export default async function Page() {
   const { user } = await validateRequest()
@@ -27,9 +28,7 @@ export default async function Page() {
           </div>
           <div className="flex flex-col gap-2">
             <form action={githubLoginAction}>
-              <button className="group flex w-min items-center justify-center whitespace-nowrap rounded-full border-2 border-gray-900 bg-gray-900 px-4 py-1.5 font-medium text-white outline-gray-900 transition-all hover:border-white hover:bg-gray-950 hover:outline hover:outline-2 focus-visible:border-white focus-visible:outline focus-visible:outline-2 active:scale-95">
-                Sign in with GitHub
-              </button>
+              <GithubSigninButton />
             </form>
           </div>
         </Card>
