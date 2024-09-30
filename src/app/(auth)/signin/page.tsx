@@ -17,13 +17,13 @@ export default async function Page() {
             <p className="text-gray-600">
               Trellix Next is a project heavily inspired by{' '}
               <a href="https://twitter.com/ryanflorence/status/1765179463497892117" className="underline hover:text-black">
-                Ryan Florence's tweet
+                Ryan Florence&apos;s tweet
               </a>{' '}
               about building a optimistic kanban board. My goal is recreate the core functionality displayed in the{' '}
               <a href="https://trellix.fly.dev/" className="underline hover:text-black">
                 original Trellix demo built in remix
               </a>{' '}
-              using next with it's new server actions, server components and the useOptimistic api.
+              using next with it&apos;s new server actions, server components and the useOptimistic api.
             </p>
           </div>
           <div className="flex flex-col gap-2">
