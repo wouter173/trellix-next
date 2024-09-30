@@ -11,7 +11,10 @@ export default async function Page({ params }: { params: { id: string } }) {
   if (!result) return notFound()
 
   return (
-    <div className="w-full py-20">
+    <div className="w-full py-10">
+      <div className="px-20 pb-4">
+        <h2 className="text-2xl font-semibold">{result.board.name}</h2>
+      </div>
       <Board columns={result.columns} boardId={params.id} />
     </div>
   )

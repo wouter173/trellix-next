@@ -21,5 +21,5 @@ export const getBoardCards = cache(async (boardId: string) => {
     orderBy: { order: 'asc' },
   })
 
-  return { columns }
+  return { columns, board }
 })

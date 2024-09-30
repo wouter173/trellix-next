@@ -117,15 +117,13 @@ export const moveCardAction = async (actionData: { boardId: string; cardId: stri
   const board = await prisma.board.findFirst({ where: { userId: user.id, id: data.boardId } })
   if (!board) return null
 
-  await prisma.$transaction([
-    prisma.card.update({
-      where: { id: data.cardId },
-      data: {
-        columnId: data.toColumnId,
-        order: data.order,
-      },
-    }),
-  ])
+  await prisma.card.update({
+    where: { id: data.cardId },
+    data: {
+      columnId: data.toColumnId,
+      order: data.order,
+    },
+  })
 
   revalidatePath(`/board/${data.boardId}`)
 

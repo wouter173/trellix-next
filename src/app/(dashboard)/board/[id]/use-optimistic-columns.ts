@@ -12,25 +12,31 @@ export function useOptimisticColumns(
   const addColumn = (name: string) => {
     startTransition(async () => {
       const id = nanoid()
-      const newCol = { name, id, order: columns.length, cards: [] }
+      const newCol = { name, id, order: optimisticColumns.length, cards: [] }
 
-      setOptimisticColumns([...columns, newCol])
+      setOptimisticColumns([...optimisticColumns, newCol])
       await addColumnAction({ ...newCol, boardId })
     })
   }
 
   const removeColumn = ({ columnId, boardId }: { columnId: string; boardId: string }) => {
     startTransition(async () => {
-      setOptimisticColumns(columns.filter((column) => column.id !== columnId))
+      setOptimisticColumns(optimisticColumns.filter((column) => column.id !== columnId))
       await removeColumnAction({ columnId, boardId })
     })
   }
 
   const addCard = ({ columnId, name }: { name: string; columnId: string }) => {
     startTransition(async () => {
-      const newCard = { id: nanoid(), name, columnId, order: (columns.find((column) => column.id === columnId)?.cards.length ?? 0) + 1 }
+      console.log({ order: (optimisticColumns.find((column) => column.id === columnId)?.cards.length ?? 0) + 1 })
+      const newCard = {
+        id: nanoid(),
+        name,
+        columnId,
+        order: (optimisticColumns.find((column) => column.id === columnId)?.cards.length ?? 0) + 1,
+      }
 
-      const nextState = produce(columns, (draftColumns) => {
+      const nextState = produce(optimisticColumns, (draftColumns) => {
         const columnIndex = draftColumns.findIndex((column) => column.id === columnId)
         draftColumns[columnIndex].cards.push(newCard)
       })
@@ -47,12 +53,12 @@ export function useOptimisticColumns(
 
   const moveCard = ({ cardId, columnId, order }: { cardId: string; columnId: string; order: number }) => {
     startTransition(async () => {
-      const card = columns.flatMap((column) => column.cards).find((card) => card.id === cardId)
+      const card = optimisticColumns.flatMap((column) => column.cards).find((card) => card.id === cardId)
       if (!card) return
 
       const toColumnId = columnId
 
-      const nextState = produce(columns, (draftColumns) => {
+      const nextState = produce(optimisticColumns, (draftColumns) => {
         const fromColumnIndex = draftColumns.findIndex((column) => column.id === card.columnId)
         const toColumnIndex = draftColumns.findIndex((column) => column.id === toColumnId)
 
@@ -74,8 +80,8 @@ export function useOptimisticColumns(
 
   const updateColumnName = (name: string, columnId: string) => {
     startTransition(async () => {
-      const columnIndex = columns.findIndex((column) => column.id === columnId)
-      const nextState = produce(columns, (draftColumns) => {
+      const columnIndex = optimisticColumns.findIndex((column) => column.id === columnId)
+      const nextState = produce(optimisticColumns, (draftColumns) => {
         draftColumns[columnIndex].name = name
       })
 
@@ -87,7 +93,7 @@ export function useOptimisticColumns(
 
   const removeCard = (cardId: string) => {
     startTransition(async () => {
-      const nextState = produce(columns, (draftColumns) => {
+      const nextState = produce(optimisticColumns, (draftColumns) => {
         const columnIndex = draftColumns.findIndex((column) => column.cards.some((card) => card.id === cardId))
         const cardIndex = draftColumns[columnIndex].cards.findIndex((card) => card.id === cardId)
         draftColumns[columnIndex].cards.splice(cardIndex, 1)
