@@ -1,9 +1,8 @@
 import { env } from '@/env'
-import { PrismaAdapter } from '@lucia-auth/adapter-prisma'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient({
-  datasourceUrl: env.DATABASE_URL,
+  datasourceUrl: env.DATABASE_POSTGRES_URL,
 })
 
 export { prisma }
