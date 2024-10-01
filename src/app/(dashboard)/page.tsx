@@ -8,15 +8,14 @@ import { Card } from '../card'
 import { AddBoardButton } from './add-board-button'
 
 export default async function Home() {
-  const { user } = await validateRequest()
-  if (!user) redirect('/signin')
-
   return (
     <div className="grid min-h-[calc(100vh-60px)] items-center justify-items-center gap-16 p-8 pb-20 sm:p-20">
       <main className="w-full max-w-sm">
         <Card className="min-h-[416px]">
           <div>
-            <h1 className="text-lg font-semibold">Hey {user.username}! </h1>
+            <Suspense fallback={<div className="my-0.5 h-6 w-32 rounded-xl bg-gray-50" />}>
+              <UserDisplay />
+            </Suspense>
             <p>Take a look at your boards</p>
           </div>
           <Suspense
@@ -40,6 +39,13 @@ export default async function Home() {
       </main>
     </div>
   )
+}
+
+const UserDisplay = async () => {
+  const { user } = await validateRequest()
+  if (!user) redirect('/signin')
+
+  return <h1 className="text-lg font-semibold">Hey {user.username}! </h1>
 }
 
 const BoardList = async () => {
