@@ -25,7 +25,7 @@ export default async function Home() {
                 {[1, 2, 3, 4, 5].map((i) => (
                   <li
                     key={i}
-                    className="flex h-[42px] w-full animate-pulse items-center justify-between rounded-xl border bg-gray-100 px-3 py-2"
+                    className="flex h-[42px] w-full animate-pulse items-center justify-between rounded-xl border bg-gray-50 px-3 py-2"
                   />
                 ))}
               </ul>
@@ -43,7 +43,6 @@ export default async function Home() {
 }
 
 const BoardList = async () => {
-  // await new Promise((resolve) => setTimeout(resolve, 1000))
   const { user } = await validateRequest()
   if (!user) redirect('/signin')
 

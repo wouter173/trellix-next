@@ -10,7 +10,11 @@ export const Nav = () => {
         </Link>
       </div>
       <div className="flex items-center gap-4">
-        <Link href="/signout" className="rounded-lg px-2 py-1 text-gray-800 transition-all hover:bg-gray-200 active:scale-95">
+        <Link
+          prefetch={false}
+          href="/signout"
+          className="rounded-lg px-2 py-1 text-gray-800 transition-all hover:bg-gray-200 active:scale-95"
+        >
           Sign out
         </Link>
       </div>
