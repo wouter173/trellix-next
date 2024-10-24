@@ -16,7 +16,7 @@ export const Board = (props: {
   const scrollContainerRef = useRef<HTMLUListElement>(null)
 
   return (
-    (<AnimatePresence initial={false}>
+    <AnimatePresence initial={false}>
       <ul
         ref={scrollContainerRef}
         className="flex h-full min-h-[calc(100dvh-152px)] w-full snap-x snap-mandatory scroll-pl-20 gap-2 overflow-x-scroll px-20 pb-20"
@@ -27,7 +27,7 @@ export const Board = (props: {
               id={column.id}
               name={column.name}
               cards={column.cards}
-              scrollContainerRef={scrollContainerRef as RefObject<HTMLUListElement | null>}
+              scrollContainerRef={scrollContainerRef as RefObject<HTMLUListElement>}
               updateName={(name) => updateColumnName(name, column.id)}
               removeColumn={(columnId) => removeColumn({ boardId: props.boardId, columnId })}
               addCard={(name) => addCard({ name, columnId: column.id })}
@@ -41,8 +41,8 @@ export const Board = (props: {
         </li>
         <li className="h-1 w-20 flex-shrink-0" />
       </ul>
-    </AnimatePresence>)
-  );
+    </AnimatePresence>
+  )
 }
 
 const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => {
@@ -113,7 +113,7 @@ const Column = (props: {
   name: string
   id: string
   cards: { name: string; id: string; order: number }[]
-  scrollContainerRef: RefObject<HTMLUListElement | null>
+  scrollContainerRef: RefObject<HTMLUListElement>
   updateName: (name: string) => void
   removeColumn: (id: string) => void
   addCard: (name: string) => void
@@ -225,7 +225,7 @@ const Column = (props: {
 const ColumnPresence = ({
   scrollContainerRef,
   ...props
-}: ComponentProps<typeof motion.div> & { scrollContainerRef: RefObject<HTMLUListElement | null> }) => {
+}: ComponentProps<typeof motion.div> & { scrollContainerRef: RefObject<HTMLUListElement> }) => {
   const columnRef = useRef<HTMLDivElement>(null)
 
   const { scrollX } = useScroll({ container: scrollContainerRef, axis: 'x' })
