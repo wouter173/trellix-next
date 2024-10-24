@@ -1,17 +1,19 @@
-import { github } from '@/lib/auth/providers/github'
 import { lucia } from '@/lib/auth/lucia'
-import { cookies } from 'next/headers'
+import { github } from '@/lib/auth/providers/github'
+import { prisma } from '@/lib/db/prisma'
 import { OAuth2RequestError } from 'arctic'
 import { generateIdFromEntropySize } from 'lucia'
-import { prisma } from '@/lib/db/prisma'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 
 export async function GET(request: Request): Promise<Response> {
+  const cookieStore = await cookies()
+
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
   const state = url.searchParams.get('state')
-  const storedState = cookies().get('github_oauth_state')?.value ?? null
-  cookies().set('github_oauth_state', '', { maxAge: 0 })
+  const storedState = cookieStore.get('github_oauth_state')?.value ?? null
+  cookieStore.set('github_oauth_state', '', { maxAge: 0 })
 
   if (!code || !state || !storedState || state !== storedState) {
     return new Response(null, {
@@ -39,7 +41,7 @@ export async function GET(request: Request): Promise<Response> {
     if (existingUser) {
       const session = await lucia.createSession(existingUser.id, {})
       const sessionCookie = lucia.createSessionCookie(session.id)
-      cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+      cookieStore.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
       return new Response(null, { status: 302, headers: { Location: '/' } })
     }
@@ -56,7 +58,7 @@ export async function GET(request: Request): Promise<Response> {
 
     const session = await lucia.createSession(userId, {})
     const sessionCookie = lucia.createSessionCookie(session.id)
-    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+    cookieStore.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
 
     return new Response(null, { status: 302, headers: { Location: '/' } })
   } catch (e) {
