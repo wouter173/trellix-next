@@ -1,4 +1,7 @@
+import { lucia } from '@/lib/auth/lucia'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 export const Nav = () => {
   return (
@@ -10,13 +13,16 @@ export const Nav = () => {
         </Link>
       </div>
       <div className="flex items-center gap-4">
-        <Link
-          prefetch={false}
-          href="/signout"
-          className="rounded-lg px-2 py-1 text-gray-800 transition-all hover:bg-gray-200 active:scale-95"
+        <form
+          action={async () => {
+            'use server'
+            const cookieStore = await cookies()
+            cookieStore.set(lucia.createBlankSessionCookie())
+            redirect('/')
+          }}
         >
-          Sign out
-        </Link>
+          <button className="rounded-lg px-2 py-1 text-gray-800 transition-all hover:bg-gray-200 active:scale-95">Sign out</button>
+        </form>
       </div>
     </nav>
   )
