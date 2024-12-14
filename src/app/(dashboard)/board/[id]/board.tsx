@@ -1,7 +1,7 @@
 'use client'
 import { cn } from '@/lib/utils'
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 import { Trash2Icon } from 'lucide-react'
+import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react'
 import { ComponentProps, DragEvent, Fragment, RefObject, useRef, useState } from 'react'
 import { useOptimisticColumns } from './use-optimistic-columns'
 

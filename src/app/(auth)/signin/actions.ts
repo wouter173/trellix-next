@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 
 export async function githubLoginAction() {
   const state = generateState()
-  const url = await github.createAuthorizationURL(state)
+  const url = await github.createAuthorizationURL(state, [])
 
   const cookieStore = await cookies()
   cookieStore.set('github_oauth_state', state, {
