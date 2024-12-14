@@ -30,7 +30,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} relative min-h-screen bg-[#ececed] font-sans dark:bg-zinc-950 dark:text-white`}
       >
-        <div className="absolute inset-0 -z-10 bg-[url(/dot.svg)] bg-repeat opacity-5"></div>
+        <div className="absolute inset-0 -z-10 bg-[url(/dot.svg)] bg-repeat opacity-50 dark:opacity-5"></div>
         <Toaster theme="system" richColors />
         {children}
       </body>

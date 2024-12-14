@@ -195,7 +195,7 @@ const Column = (props: {
     <ColumnPresence scrollContainerRef={props.scrollContainerRef}>
       <div
         className={cn(
-          'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 pt-3 shadow-sm dark:bg-zinc-900',
+          'mt-1 flex w-80 flex-col gap-2 rounded-xl border border-transparent bg-gray-100 p-2 pt-3 shadow-sm dark:border-zinc-800/50 dark:bg-zinc-900',
           dragOver && props.cards.length === 0 && 'opacity-100 ring-[3px] ring-red-500',
         )}
         onDragOver={onDragOver}
