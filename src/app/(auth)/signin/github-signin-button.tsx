@@ -1,5 +1,5 @@
 'use client'
-import { SpinnerButton } from '@/app/button'
+import { SpinnerButton } from '@/components/button'
 import { useFormStatus } from 'react-dom'
 
 export const GithubSigninButton = () => {

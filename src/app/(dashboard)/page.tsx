@@ -4,7 +4,7 @@ import { ChevronRightIcon, FileTextIcon } from 'lucide-react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
-import { Card } from '../card'
+import { Card } from '../../components/card'
 import { AddBoardButton } from './add-board-button'
 
 export default async function Home() {

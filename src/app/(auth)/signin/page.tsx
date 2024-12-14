@@ -1,4 +1,4 @@
-import { Card } from '@/app/card'
+import { Card } from '@/components/card'
 import { validateRequest } from '@/lib/auth/api'
 import { redirect } from 'next/navigation'
 import { githubLoginAction } from './actions'

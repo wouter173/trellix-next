@@ -1,8 +1,8 @@
 'use client'
 
+import { SpinnerButton } from '@/components/button'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
-import { SpinnerButton } from '../button'
 import { addBoard } from './actions'
 
 export const AddBoardButton = () => {
