@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation'
 import { Board } from './board'
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+  const params = await props.params
   const { user } = await validateRequest()
   if (!user) redirect('/signin')
 

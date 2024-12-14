@@ -13,7 +13,7 @@ export default async function Home() {
       <main className="w-full max-w-sm">
         <Card className="min-h-[416px]">
           <div>
-            <Suspense fallback={<div className="my-0.5 h-6 w-32 rounded-xl bg-gray-50" />}>
+            <Suspense fallback={<div className="my-0.5 h-6 w-32 rounded-xl bg-gray-50 dark:bg-zinc-800/70" />}>
               <UserDisplay />
             </Suspense>
             <p>Take a look at your boards</p>
@@ -24,7 +24,7 @@ export default async function Home() {
                 {[1, 2, 3, 4, 5].map((i) => (
                   <li
                     key={i}
-                    className="flex h-[42px] w-full animate-pulse items-center justify-between rounded-xl border bg-gray-50 px-3 py-2"
+                    className="flex h-[42px] w-full animate-pulse items-center justify-between rounded-xl border bg-gray-50 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-800/70"
                   />
                 ))}
               </ul>
@@ -60,7 +60,7 @@ const BoardList = async () => {
       {boards.map((board) => (
         <li key={board.id} className="">
           <Link
-            className="flex w-full items-center justify-between rounded-xl border px-3 py-2 hover:bg-gray-100 hover:underline"
+            className="flex w-full items-center justify-between rounded-xl border px-3 py-2 hover:bg-gray-100 hover:underline dark:border-zinc-800 dark:hover:bg-zinc-800/70"
             href={`/board/${board.id}`}
           >
             <div className="flex items-center gap-2">

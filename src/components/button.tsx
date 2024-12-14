@@ -7,7 +7,9 @@ export const Button = ({ className, children, ...props }: ComponentProps<'button
   return (
     <button
       className={cn(
-        'group flex w-min items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-gray-900 bg-gray-900 px-4 py-1.5 font-medium text-white outline-gray-900 transition-all enabled:hover:border-white enabled:hover:bg-gray-950 enabled:hover:outline enabled:hover:outline-2 enabled:focus-visible:border-white enabled:focus-visible:outline enabled:focus-visible:outline-2 enabled:active:scale-95 disabled:opacity-85',
+        'group flex w-min items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 px-4 py-1.5 font-medium transition-all enabled:hover:outline enabled:hover:outline-2 enabled:focus-visible:outline enabled:focus-visible:outline-2 enabled:active:scale-95 disabled:opacity-85',
+        'border-gray-900 bg-gray-900 text-white outline-gray-900 enabled:hover:border-white enabled:hover:bg-gray-950 enabled:focus-visible:border-white',
+        'enabled:focus-visible:border-white dark:border-[2.5px] dark:border-gray-100 dark:bg-gray-100 dark:text-black dark:outline-gray-100 dark:enabled:hover:border-gray-900 dark:enabled:hover:bg-white',
         className,
       )}
       {...props}
@@ -17,15 +19,9 @@ export const Button = ({ className, children, ...props }: ComponentProps<'button
   )
 }
 
-export const SpinnerButton = ({ pending, className, children, ...props }: ComponentProps<'button'> & { pending?: boolean }) => {
+export const SpinnerButton = ({ pending, className, children, ...props }: ComponentProps<typeof Button> & { pending?: boolean }) => {
   return (
-    <button
-      className={cn(
-        'group flex w-min items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-gray-900 bg-gray-900 px-4 py-1.5 font-medium text-white outline-gray-900 transition-all enabled:hover:border-white enabled:hover:bg-gray-950 enabled:hover:outline enabled:hover:outline-2 enabled:focus-visible:border-white enabled:focus-visible:outline enabled:focus-visible:outline-2 enabled:active:scale-95 disabled:opacity-85',
-        className,
-      )}
-      {...props}
-    >
+    <Button {...props}>
       {children}
       <AnimatePresence>
         {pending && (
@@ -40,6 +36,6 @@ export const SpinnerButton = ({ pending, className, children, ...props }: Compon
           </motion.div>
         )}
       </AnimatePresence>
-    </button>
+    </Button>
   )
 }

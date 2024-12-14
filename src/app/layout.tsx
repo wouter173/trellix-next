@@ -27,9 +27,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
           __html: `window.plausible = window.plausible || function() {(window.plausible.q = window.plausible.q || []).push(arguments)}`,
         }}
       />
-      <body className={`${GeistSans.variable} ${GeistMono.variable} relative min-h-screen bg-[#ececed] font-sans`}>
-        <div className="absolute inset-0 -z-10 bg-[url(/dot.svg)] bg-repeat opacity-50"></div>
-        <Toaster />
+      <body
+        className={`${GeistSans.variable} ${GeistMono.variable} relative min-h-screen bg-[#ececed] font-sans dark:bg-zinc-950 dark:text-white`}
+      >
+        <div className="absolute inset-0 -z-10 bg-[url(/dot.svg)] bg-repeat opacity-5"></div>
+        <Toaster theme="system" richColors />
         {children}
       </body>
     </html>

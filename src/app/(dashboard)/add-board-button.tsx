@@ -9,7 +9,9 @@ export const AddBoardButton = () => {
   const [pending, startTransition] = useTransition()
 
   const onClick = async () => {
+    console.log('add board, 2')
     startTransition(async () => {
+      console.log('add board')
       const { error } = await addBoard()
       if (error) {
         toast.error(error)

@@ -63,7 +63,7 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
   if (!editing)
     return (
       <button
-        className="focusable pressable mt-1 w-max rounded-xl px-2.5 py-1.5 text-left font-medium transition-all hover:bg-gray-100 hover:shadow-sm"
+        className="focusable pressable mt-1 w-max rounded-xl px-2.5 py-1.5 text-left font-medium transition-all hover:bg-gray-100 hover:shadow-sm dark:hover:bg-zinc-800"
         onClick={() => setEditing(true)}
       >
         + add column
@@ -72,7 +72,7 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
 
   return (
     <form
-      className="mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 shadow-sm"
+      className="mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 shadow-sm dark:bg-zinc-900"
       ref={formRef}
       noValidate={false}
       onSubmit={(e) => {
@@ -86,7 +86,7 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
       <input
         required
         autoFocus
-        className="w-full resize-none rounded-lg p-2 py-1"
+        className="focusable w-full resize-none rounded-lg p-2 py-1 dark:bg-zinc-800"
         onChange={(e) => setName(e.target.value)}
         value={name}
         onKeyDown={(e) => {
@@ -98,10 +98,17 @@ const AddColumnForm = ({ addColumn }: { addColumn: (name: string) => void }) => 
         }}
       />
       <div className="flex gap-2">
-        <button type="submit" className="focusable pressable rounded-lg bg-gray-700 px-2 py-1.5 text-white hover:bg-gray-900">
+        <button
+          type="submit"
+          className="focusable pressable rounded-lg bg-gray-700 px-2 py-1.5 text-white hover:bg-gray-900 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+        >
           Create
         </button>
-        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-gray-200">
+        <button
+          type="button"
+          onClick={() => stopEditing()}
+          className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700"
+        >
           Cancel
         </button>
       </div>
@@ -188,7 +195,7 @@ const Column = (props: {
     <ColumnPresence scrollContainerRef={props.scrollContainerRef}>
       <div
         className={cn(
-          'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 pt-3 shadow-sm',
+          'mt-1 flex w-80 flex-col gap-2 rounded-xl bg-gray-100 p-2 pt-3 shadow-sm dark:bg-zinc-900',
           dragOver && props.cards.length === 0 && 'opacity-100 ring-[3px] ring-red-500',
         )}
         onDragOver={onDragOver}
@@ -199,7 +206,7 @@ const Column = (props: {
           <ColumnName name={props.name} updateName={props.updateName} />
           <button
             onClick={removeColumn}
-            className="pressable focusable -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-gray-400 opacity-0 ring-red-500 transition-all hover:text-red-500 group-hover:opacity-100"
+            className="pressable focusable -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-gray-400 opacity-0 ring-red-500 transition-all hover:text-red-500 focus-visible:opacity-100 group-hover:opacity-100"
           >
             <Trash2Icon className="size-4" />
           </button>
@@ -249,7 +256,7 @@ const ColumnName = (props: { name: string; updateName: (name: string) => void })
 
   if (!isEditingName)
     return (
-      <button onClick={() => setIsEditingName(true)} className="w-11/12 shrink text-left">
+      <button onClick={() => setIsEditingName(true)} className="focusable w-11/12 shrink text-left">
         <h2 className="truncate">{name}</h2>
       </button>
     )
@@ -257,7 +264,7 @@ const ColumnName = (props: { name: string; updateName: (name: string) => void })
   return (
     <input
       autoFocus
-      className="focusable -ml-2 w-11/12 rounded-lg px-2"
+      className="focusable -ml-2 w-11/12 rounded-lg px-2 dark:bg-zinc-800"
       value={name}
       onChange={(e) => setName(e.target.value)}
       onKeyDown={(e) => {
@@ -293,7 +300,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
   if (!editing)
     return (
       <button
-        className="focusable pressable rounded-lg px-2.5 py-1.5 text-left font-medium hover:bg-gray-200"
+        className="focusable pressable rounded-lg px-2.5 py-1.5 text-left font-medium hover:bg-gray-200 dark:hover:bg-zinc-800"
         onClick={() => setEditing(true)}
       >
         + add card
@@ -316,7 +323,7 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
       <textarea
         required
         autoFocus
-        className="w-full resize-none rounded-lg p-2 py-1"
+        className="focusable w-full resize-none rounded-lg p-2 py-1 dark:bg-zinc-800"
         rows={3}
         onChange={(e) => setName(e.target.value)}
         value={name}
@@ -329,10 +336,17 @@ const AddCardForm = ({ addCard }: { addCard: (name: string) => void }) => {
         }}
       />
       <div className="flex gap-2">
-        <button type="submit" className="focusable pressable rounded-lg bg-gray-700 px-2 py-1.5 text-white hover:bg-gray-900">
+        <button
+          type="submit"
+          className="focusable pressable rounded-lg bg-gray-700 px-2 py-1.5 text-white hover:bg-gray-900 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+        >
           Save Card
         </button>
-        <button type="button" onClick={() => stopEditing()} className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-gray-200">
+        <button
+          type="button"
+          onClick={() => stopEditing()}
+          className="focusable pressable rounded-lg px-2 py-1.5 hover:bg-gray-200 dark:hover:bg-zinc-700"
+        >
           Cancel
         </button>
       </div>
@@ -348,12 +362,12 @@ const Card = (props: { name: string; id: string; order: number; removeCard: () =
           e.dataTransfer.setData('card-id', props.id)
         }}
         className={cn(
-          'border-t-px border-b-px py-1shadow-sm group flex w-full cursor-grab justify-between rounded-lg border border-transparent bg-white px-2 py-1 active:cursor-grabbing',
+          'border-t-px border-b-px py-1shadow-sm group flex w-full cursor-grab justify-between rounded-lg border border-transparent bg-white px-2 py-1 active:cursor-grabbing dark:bg-zinc-800',
         )}
         draggable
       >
         <p className="hyphens-auto whitespace-pre-wrap break-words">{props.name}</p>
-        <button className="pressable focusable -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-gray-400 opacity-0 ring-red-500 transition-all hover:text-red-500 group-hover:opacity-100">
+        <button className="pressable focusable -mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-gray-400 opacity-0 ring-red-500 transition-all hover:text-red-500 focus-visible:opacity-100 group-hover:opacity-100">
           <Trash2Icon className="size-4" onClick={props.removeCard} />
         </button>
       </div>
