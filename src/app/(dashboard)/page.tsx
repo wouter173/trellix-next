@@ -60,6 +60,7 @@ const BoardList = async () => {
       {boards.map((board) => (
         <li key={board.id} className="">
           <Link
+            prefetch={true}
             className="flex w-full items-center justify-between rounded-xl border px-3 py-2 hover:bg-gray-100 hover:underline dark:border-zinc-800 dark:hover:bg-zinc-800/70"
             href={`/board/${board.id}`}
           >

@@ -9,6 +9,7 @@ export const Nav = () => {
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-bold">Trellix Next</h1>
         <Link
+          prefetch={true}
           href="/"
           className="rounded-lg px-2 py-1 text-gray-800 transition-all hover:bg-gray-200 active:scale-95 dark:text-gray-50 dark:hover:bg-zinc-800"
         >
