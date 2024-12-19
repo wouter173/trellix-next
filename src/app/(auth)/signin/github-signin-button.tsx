@@ -1,13 +1,28 @@
 'use client'
-import { SpinnerButton } from '@/components/button'
+import { Button } from '@/components/button'
+import { Spinner } from '@/components/spinner'
+import { AnimatePresence, motion } from 'motion/react'
 import { useFormStatus } from 'react-dom'
 
 export const GithubSigninButton = () => {
   const { pending } = useFormStatus()
 
   return (
-    <SpinnerButton disabled={pending} pending={pending}>
+    <Button disabled={pending}>
       Sign in with GitHub
-    </SpinnerButton>
+      <AnimatePresence>
+        {pending && (
+          <motion.div
+            animate={{ width: 'auto', opacity: 1, scale: 1 }}
+            initial={{ width: '0px', opacity: 0, scale: 0.95 }}
+            exit={{ width: '0px', opacity: 0, scale: 0.95 }}
+            transition={{ ease: 'easeInOut', duration: 0.1 }}
+            className="overflow-hidden"
+          >
+            <Spinner />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Button>
   )
 }

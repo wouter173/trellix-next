@@ -136,7 +136,7 @@ const Column = (props: {
     highlightIndicators(e)
   }
 
-  const onDragLeave = (e: DragEvent<HTMLDivElement>) => {
+  const onDragLeave = () => {
     setDragOver(false)
     setClosestIndicatorIndex(null)
   }
@@ -239,7 +239,7 @@ const ColumnPresence = ({
   const relativeX = useTransform(scrollX, (value) => {
     const leftOffset = value - (columnRef.current?.offsetLeft ?? 0)
     const rightOffset =
-      scrollContainerRef.current?.clientWidth! - (columnRef.current?.offsetLeft ?? 0) - (columnRef.current?.clientWidth ?? 0) + value - 200
+      scrollContainerRef.current?.clientWidth - (columnRef.current?.offsetLeft ?? 0) - (columnRef.current?.clientWidth ?? 0) + value - 200
 
     return Math.max(leftOffset, -1 * rightOffset)
   })
