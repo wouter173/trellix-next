@@ -1,4 +1,5 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "tailwindCSS.experimental.classRegex": ["tw\\('([^']*)'\\)"]
+  "tailwindCSS.experimental.classRegex": ["tw\\('([^']*)'\\)"],
+  "prisma.pinToPrisma6": true
 }
