@@ -24,7 +24,7 @@
     "lucide-react": "^ 0.446.0",
     "motion": "11.14.4",
     "nanoid": "^5.0.9",
-    "next": "15.1.2",
+    "next": "15.1.11",
     "oslo": "^1.2.1",
     "prettier-plugin-tailwindcss": "^0.6.1",
     "prisma": "^5.20.0",
