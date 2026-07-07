@@ -18,7 +18,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <Script
         defer
         id="plausible"
-        data-domain="trellix-next.vercel.app"
+        data-domain="trellix.wouterdb.com"
         src="https://plausible.wouter.cloud/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"
       />
       <Script
